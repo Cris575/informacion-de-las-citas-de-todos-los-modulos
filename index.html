@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Citas del INE</title>
+    <style>
+        /* Estilos CSS para la interfaz */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-container button {
+            background-color: #340fba;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .calendar-container {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .calendar-container .month {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .calendar-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .calendar-container th,
+        .calendar-container td {
+            text-align: center;
+            padding: 5px;
+        }
+
+        .calendar-container .day-header {
+            font-weight: bold;
+        }
+
+        .calendar-container .day {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .calendar-container .day:hover {
+            background-color: #f2f2f2;
+        }
+
+        .calendar-container .selected {
+            background-color: #340fba;
+            color: #fff;
+        }
+
+        .availability-container {
+            margin-top: 20px;
+        }
+
+        .availability-container h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .availability-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .availability-container ul li {
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .module-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .module-container button {
+            background-color: #340fba;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: auto;
+        }
+
+        .confirmation-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .confirmation-container h2 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Citas del INE</h1>
+
+    <div class="form-container">
+        <h2>Iniciar sesión</h2>
+        <form>
+            <label for="username">Usuario:</label>
+            <input type="text" id="username" required>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Iniciar sesión</button>
+        </form>
+    </div>
+
+    <div class="calendar-container">
+        <h2>Calendario</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th class="day-header">Lun</th>
+                    <th class="day-header">Mar</th>
+                    <th class="day-header">Mié</th>
+                    <th class="day-header">Jue</th>
+                    <th class="day-header">Vie</th>
+                    <th class="day-header">Sáb</th>
+                    <th class="day-header">Dom</th>
+                </tr>
+            </thead>
+            <tbody id="calendar-body">
+                <!-- El contenido del calendario se generará dinámicamente aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="availability-container">
+        <h2>Horarios disponibles el 1 de junio 2023</h2>
+        <ul id="availability-list">
+            <li>9:00 AM - 10:00 AM</li>
+            <li>10:00 AM - 11:00 AM</li>
+            <li>11:00 AM - 12:00 PM</li>
+            <!-- Resto de los horarios disponibles -->
+        </ul>
+    </div>
+
+    <div class="module-container">
+        <h2>Selecciona un módulo para tu cita</h2>
+        <button>Módulo 1</button>
+        <button>Módulo 2</button>
+        <button>Módulo 3</button>
+    </div>
+
+    <div class="confirmation-container">
+        <button type="submit">Confirmar cita</button>
+    </div>
+
+    <script>
+        // JavaScript para generar dinámicamente los días y meses y gestionar la selección
+
+        const calendarBody = document.getElementById('calendar-body');
+        const availabilityList = document.getElementById('availability-list');
+        let selectedDay = null;
+        let selectedTime = null;
+
+        // Obtiene el número de días en un mes específico
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        // Genera los elementos HTML para un mes específico
+        function generateMonth(year, month) {
+            const daysInMonth = getDaysInMonth(year, month);
+            const firstDay = new Date(year, month, 1).getDay();
+
+            let day = 1;
+
+            // Genera las filas y celdas para cada día del mes
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+
+                for (let j = 0; j < 7; j++) {
+                    if ((i === 0 && j < firstDay) || day > daysInMonth) {
+                        const cell = document.createElement('td');
+                        cell.textContent = '-';
+                        row.appendChild(cell);
+                    } else {
+                        const cell = document.createElement('td');
+                        cell.textContent = day;
+                        cell.addEventListener('click', () => selectDay(cell));
+                        row.appendChild(cell);
+                        day++;
+                    }
+                }
+
+                calendarBody.appendChild(row);
+            }
+        }
+
+        // Genera los meses del año
+        function generateYear(year) {
+            for (let i = 0; i < 12; i++) {
+                const month = document.createElement('div');
+                month.classList.add('month');
+                month.textContent = getMonthName(i);
+                calendarBody.appendChild(month);
+
+                generateMonth(year, i);
+            }
+        }
+
+        // Obtiene el nombre del mes según su número
+        function getMonthName(month) {
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            return monthNames[month];
+        }
+
+        // Función para seleccionar un día y resaltarlo
+        function selectDay(cell) {
+            if (selectedDay) {
+                selectedDay.classList.remove('selected');
+            }
+
+            selectedDay = cell;
+            selectedDay.classList.add('selected');
+        }
+
+        // Función para seleccionar un horario y resaltarlo
+        function selectTime(time) {
+            if (selectedTime) {
+                selectedTime.classList.remove('selected');
+            }
+
+            selectedTime = time;
+            selectedTime.classList.add('selected');
+        }
+
+        // Llama a la función para generar todos los meses del año actual
+        const currentYear = new Date().getFullYear();
+        generateYear(currentYear);
+    </script>
+</body>
+</html>
